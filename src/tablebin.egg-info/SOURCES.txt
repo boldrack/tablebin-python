@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+src/tablebin/__init__.py
+src/tablebin/exceptions.py
+src/tablebin/tablebin.py
+src/tablebin.egg-info/PKG-INFO
+src/tablebin.egg-info/SOURCES.txt
+src/tablebin.egg-info/dependency_links.txt
+src/tablebin.egg-info/requires.txt
+src/tablebin.egg-info/top_level.txt

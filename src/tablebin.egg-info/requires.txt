@@ -1,0 +1,6 @@
+requests
+
+[dev]
+bumpver
+pip-tools
+pytest

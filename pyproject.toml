@@ -1,0 +1,29 @@
+# pyproject.toml
+
+[build-system]  
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tablebin"
+version = "1.0.0"
+description = "A light weight python api for the table bin platform."
+readme = "README.md"
+authors = [{name = "boldrack", email = "me@boldrack.dev"}]
+license = { file = "LICENSE" }
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+]
+keywords = ["table", "api"]
+dependencies = [
+  "requests"
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["bumpver", "pip-tools", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/boldrack/tablebin-python"
