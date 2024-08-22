@@ -1,0 +1,123 @@
+from dataclasses import dataclass
+from typing import List, Optional, Union
+
+import requests
+
+FieldTypes = ('string', 'number', 'boolean')
+
+
+class TableFormatter: 
+    pass
+
+
+class TableLinkFormatter(TableFormatter):
+    pass
+
+
+@dataclass
+class TableColumn:
+    name: str
+    field_type: str = 'string' # validate this 
+    sortable: bool = False
+    formatter: Optional[TableFormatter] = None
+
+    def __post_init__(self):
+        assert(self.field_type in FieldTypes)
+
+
+class TableHeader:
+    '''
+    container for table header. only requires table items on the minimum
+    '''
+    def __init__(self) -> None:
+        self._columns = []
+
+
+    def add_column(self, column: TableColumn):
+        self._columns.append(column)
+
+
+    @property
+    def columns(self):
+        return self._columns
+
+
+    def _serialize(self, ):
+        return [
+            {'name': column.name, 'field_type': column.field_type, 'sortable': column.sortable} 
+            for column in self._columns
+        ]
+
+
+class TableData: 
+    '''
+    a container for the table data along with validations and helper methods 
+    '''
+    def __init__(self, data: List[List[Union[str, int, bool]]], *args, **kwargs):
+        self._data = data
+        self._validated = False
+        # TODO: perform validation here
+
+
+    def validate(self, header: TableHeader):
+        # TODO: validate the row length for each 
+        pass
+
+
+    def _serialize(self, ):
+        return self._data
+
+
+@dataclass
+class TableConfig:
+    pass
+
+
+class TableBin:
+    '''
+    The main container / class for the table bin interactor 
+    houses small components 
+    '''
+    API_HOST = 'http://localhost:8000'
+
+    def __init__(self, api_key: str, *args, **kwargs):
+        self._api_key = api_key
+
+
+    def _make_tablebin_request(self, endpoint: str, data):
+        # adds headers as appropriate 
+        # handle failure with our exceptions
+        # ... add more 
+        url = '/'.join([self.API_HOST, endpoint])
+        headers = {'Content-Type': 'application/json', 'X-API-KEY': self._api_key}
+        response = requests.post(url, json=data, headers=headers)
+        print(f'{response.text=}')
+        return response.json()
+
+
+    def create_table(self, header: TableHeader, data: TableData):
+        '''
+        what we expecting from these two containers . 
+        header: 
+            items: 
+                field_type
+                name
+        data: 
+            just the row of data but with validation
+
+        -- 
+        data wise what do we need to create a table at table bin
+        - header.items[n]name,field_type -> need extrac this from the header instance 
+        - config -> ought to be optional 
+        - table_data -> a list of list 
+        '''
+
+        # TODO: validation ; assert the right container instance are passed 
+        #   for both header and data
+
+        json_data = {'header': {'items': header._serialize()}, 'config': {}, 'data': data._serialize()}
+        # print(f'{json_data=}')
+        response = self._make_tablebin_request('/tables/', json_data)
+        print(response)
+
+
