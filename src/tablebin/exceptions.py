@@ -1,0 +1,2 @@
+class TablebinException(Exception):
+    pass

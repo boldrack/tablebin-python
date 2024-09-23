@@ -2,16 +2,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Union
 
 import requests
+from tablebin.formatters import TableFormatter
 
 FieldTypes = ('string', 'number', 'boolean')
-
-
-class TableFormatter: 
-    pass
-
-
-class TableLinkFormatter(TableFormatter):
-    pass
 
 
 @dataclass
@@ -30,7 +23,7 @@ class TableHeader:
     container for table header. only requires table items on the minimum
     '''
     def __init__(self) -> None:
-        self._columns = []
+        self._columns: List[TableColumn] = []
 
 
     def add_column(self, column: TableColumn):
@@ -43,8 +36,12 @@ class TableHeader:
 
 
     def _serialize(self, ):
+        
         return [
-            {'name': column.name, 'field_type': column.field_type, 'sortable': column.sortable} 
+            {'name': column.name, 'field_type': column.field_type, 
+             'sortable': column.sortable, 
+             'formatter': column.formatter.format() if column.formatter else None
+            } 
             for column in self._columns
         ]
 
@@ -78,7 +75,8 @@ class TableBin:
     The main container / class for the table bin interactor 
     houses small components 
     '''
-    API_HOST = 'http://localhost:8000'
+    # API_HOST = 'http://localhost:8000'
+    API_HOST = 'https://api.tablebin.app'
 
     def __init__(self, api_key: str, *args, **kwargs):
         self._api_key = api_key
@@ -89,10 +87,13 @@ class TableBin:
         # handle failure with our exceptions
         # ... add more 
         url = '/'.join([self.API_HOST, endpoint])
+        print(url)
         headers = {'Content-Type': 'application/json', 'X-API-KEY': self._api_key}
-        response = requests.post(url, json=data, headers=headers)
+        print(headers)
+        response = requests.post(url, json=data, headers=headers, timeout=60)
         print(f'{response.text=}')
-        return response.json()
+        # return response.json()
+        return response
 
 
     def create_table(self, header: TableHeader, data: TableData):
@@ -115,9 +116,10 @@ class TableBin:
         # TODO: validation ; assert the right container instance are passed 
         #   for both header and data
 
-        json_data = {'header': {'items': header._serialize()}, 'config': {}, 'data': data._serialize()}
+        json_data = {'header': {'items': header._serialize()}, 'config': {}, 
+                     'data': data._serialize() }
         # print(f'{json_data=}')
-        response = self._make_tablebin_request('/tables/', json_data)
-        print(response)
+        response = self._make_tablebin_request('tables/', json_data)
+        return response
 
 

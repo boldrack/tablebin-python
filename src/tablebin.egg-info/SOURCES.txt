@@ -4,6 +4,7 @@ README.md
 pyproject.toml
 src/tablebin/__init__.py
 src/tablebin/exceptions.py
+src/tablebin/formatters.py
 src/tablebin/tablebin.py
 src/tablebin.egg-info/PKG-INFO
 src/tablebin.egg-info/SOURCES.txt
