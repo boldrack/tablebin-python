@@ -2,6 +2,11 @@
 A light weight python api for the table bin platform. 
 
 * A sample code looks like below 
+
+
+    "{version}",
+    "{pep440_version}",
+
 '''
     with open('mylist.json') as f: 
         mylist = json.load(f)
