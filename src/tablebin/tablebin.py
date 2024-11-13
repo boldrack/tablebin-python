@@ -1,10 +1,27 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional, Union
+import pprint
 
 import requests
 from tablebin.formatters import TableFormatter
+from tablebin.row import RowFormat
 
 FieldTypes = ('string', 'number', 'boolean')
+
+
+@dataclass
+class TableConfig:
+    row_formatters: List[RowFormat] = field(default_factory=list)
+    protected: bool = False
+
+    def _serialize(self):
+        return { 
+            'protected': self.protected, 
+            'row_formatters': [formatter.serialize() for formatter in self.row_formatters]
+        }
+
+    def set_rowformatters(self, formatters: List[RowFormat]):
+        self.row_formatters = formatters
 
 
 @dataclass
@@ -65,18 +82,13 @@ class TableData:
         return self._data
 
 
-@dataclass
-class TableConfig:
-    pass
-
-
 class TableBin:
     '''
     The main container / class for the table bin interactor 
     houses small components 
     '''
-    # API_HOST = 'http://localhost:8000'
-    API_HOST = 'https://api.tablebin.app'
+    API_HOST = 'http://localhost:8000'
+    # API_HOST = 'https://api.tablebin.app'
 
     def __init__(self, api_key: str, *args, **kwargs):
         self._api_key = api_key
@@ -96,7 +108,7 @@ class TableBin:
         return response
 
 
-    def create_table(self, header: TableHeader, data: TableData):
+    def create_table(self, header: TableHeader, data: TableData, row_formatters=None):
         '''
         what we expecting from these two containers . 
         header: 
@@ -112,13 +124,16 @@ class TableBin:
         - config -> ought to be optional 
         - table_data -> a list of list 
         '''
+        config = TableConfig() 
+        if row_formatters:
+            config.set_rowformatters(row_formatters)
 
         # TODO: validation ; assert the right container instance are passed 
         #   for both header and data
 
-        json_data = {'header': {'items': header._serialize()}, 'config': {}, 
+        json_data = {'header': {'items': header._serialize()}, 'config': config._serialize(), 
                      'data': data._serialize() }
-        # print(f'{json_data=}')
+        pprint.pprint(json_data)
         response = self._make_tablebin_request('tables/', json_data)
         return response
 
